@@ -59,7 +59,7 @@ const loginUser=async(req,res)=>{
     try{
         const {email,password}=req.body;
         //check for missing fields
-        console.log("User details:",req.body)
+        
         if(!email || !password){
             return res.status(400).json({
                 message:"All fields are required"
@@ -68,7 +68,7 @@ const loginUser=async(req,res)=>{
 
         //check if user exists
         const user=await User.findOne({email:email.toLowerCase().trim()})
-        console.log("user fro db",user)
+        
     //if user not exits
         if(!user){
             return res.status(400).json({

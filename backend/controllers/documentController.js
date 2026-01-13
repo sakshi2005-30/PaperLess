@@ -4,7 +4,8 @@ const Document=require("../models/Document");
 
 const uploadDocument=async(req,res)=>{
     try{
-        const {title}=req.body;
+        const {title,folderId}=req.body;
+        console.log("REQ BODY:",req.body)
         //check file eixts
         if(!req.file){
             return res.status(400).json({
@@ -27,7 +28,8 @@ const uploadDocument=async(req,res)=>{
             title,
             fileUrl:uploadResult.secure_url,
             publicId:uploadResult.public_id,
-            fileType:req.file.mimetype
+            fileType:req.file.mimetype,
+            folder:folderId||null
         })
         res.status(201).json(doc);
     }
@@ -40,8 +42,10 @@ const uploadDocument=async(req,res)=>{
 
 const getDocuments=async(req,res)=>{
     try{
-        const docs=await Document.find({user:req.user});
-        res.status(200).json(docs).sort({createdAt:-1});
+        const docs = await Document.find({ user: req.user }).sort({
+          createdAt: -1,
+        });
+        res.status(200).json(docs);
 
     }
     catch(err){

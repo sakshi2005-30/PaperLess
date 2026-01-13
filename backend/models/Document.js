@@ -26,6 +26,11 @@ const documentSchema=new mongoose.Schema({
     fileType:{
         type:String,
         required:true
+    },
+    folder:{
+        type:mongoose.Schema.Types.ObjectId,
+        ref:"Folder",
+        default:null
     }
 },{timestamps:true});
 module.exports=mongoose.model("Document",documentSchema)
