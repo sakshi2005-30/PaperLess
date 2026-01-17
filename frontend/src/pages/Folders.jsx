@@ -9,6 +9,7 @@ const Folders = () => {
     const [optionId,setOptionsId]=useState(null);
     const [newFolder,setNewFolder]=useState(false);
     const [name,setName]=useState("");
+    const [documents,setDocuments]=useState([]);
     const ref=useRef(null)
     useEffect(()=>{
         const fetchFolders=async()=>{
@@ -22,7 +23,17 @@ const Folders = () => {
                 console.log("Error in fetching folders",err)
             }
         }
+        const fetchDocs=async()=>{
+            try{
+                const res=await api.get("/documents");
+                setDocuments(res.data);
+            }
+            catch(err){
+                console.log("Error in fetching docs",err);
+            }
+        }
         fetchFolders();
+        fetchDocs();
 
         const handleClickOutside=(e)=>{
             if(ref.current && !ref.current.contains(e.target)){
@@ -40,6 +51,7 @@ const Folders = () => {
             setFolders((prev)=>prev.filter((item)=>item._id!==id));
         }
         catch(err){
+            console.log("Error in deleteing folder",err);
 
         }
     }
@@ -60,6 +72,10 @@ const Folders = () => {
             console.log("Error in creating folder",err);
         }
     }
+
+    const handleDocsCount=(id)=>{
+        return documents.filter((doc)=>doc.folder===id).length;
+    }
   return (
     <div className="flex bg-gay-100">
       <SideBar />
@@ -70,7 +86,7 @@ const Folders = () => {
           <p className="text-2xl font-medium">Your Folders</p>
           <div>
             <button
-              className="px-6 py-2 bg-purple-600 rounded-lg text-white font-medium flex space-x-2"
+              className="px-6 py-2 bg-purple-600 rounded-lg text-white font-medium flex space-x-2 hover:bg-purple-500 cursor-pointer"
               onClick={() => setNewFolder(true)}
             >
               <Plus />
@@ -80,22 +96,30 @@ const Folders = () => {
               <div className="z-40 fixed inset-0 flex justify-center items-center backdrop-blur-sm bg-black/30 ">
                 <div className="bg-white py-10 px-14 rounded-lg shadow-md w-md">
                   <div className="flex justify-between items-center">
-                    <p className="text-2xl font-medium text-purple-600">Add new Folder</p>
-                    <X onClick={()=>setNewFolder(false)}
-                        className="h-8 w-8 p-1 hover:bg-gray-300 hover:rounded-full cursor-pointer"/>
+                    <p className="text-2xl font-medium text-purple-600">
+                      Add new Folder
+                    </p>
+                    <X
+                      onClick={() => setNewFolder(false)}
+                      className="h-8 w-8 p-1 hover:bg-gray-300 hover:rounded-full cursor-pointer"
+                    />
                   </div>
 
                   <form className="flex flex-col space-y-6 mt-8 mb-4">
-                    <input 
-                    type="text"
-                    placeholder="Enter folder name"
-                    name="name"
-                    value={name}
-                    onChange={(e)=>setName(e.target.value)}
-
-                    className="border rounded-lg px-4 py-2 border-gray-300 focus-within:border-2 focus-within:border-purple-600 outline-none"
-                     />
-                     <button className="px-4 py-2 bg-purple-600 rounded-lg text-white font-medium hover:bg-purple-700 cursor-pointer" onClick={(e)=>handleCreateFolder(e)}>Create</button>
+                    <input
+                      type="text"
+                      placeholder="Enter folder name"
+                      name="name"
+                      value={name}
+                      onChange={(e) => setName(e.target.value)}
+                      className="border rounded-lg px-4 py-2 border-gray-300 focus-within:border-2 focus-within:border-purple-600 outline-none"
+                    />
+                    <button
+                      className="px-4 py-2 bg-purple-600 rounded-lg text-white font-medium hover:bg-purple-700 cursor-pointer"
+                      onClick={(e) => handleCreateFolder(e)}
+                    >
+                      Create
+                    </button>
                   </form>
                 </div>
               </div>
@@ -122,6 +146,7 @@ const Folders = () => {
                         setOptionsId(optionId === item._id ? null : item._id)
                       }
                     />
+                    {/* <p>{handleDocsCount(item._id)}</p> */}
                     {optionId === item._id && (
                       <button
                         className="absolute px-4 rounded-lg border-gray-300 shadow-lg py-2 border right-0 hover:bg-gray-200 cursor-pointer"
@@ -135,6 +160,7 @@ const Folders = () => {
                 </div>
 
                 <p className="text-xl font-medium mt-2">{item.name}</p>
+                <p className="text-gray-400 mt-2">{handleDocsCount(item._id)} items</p>
               </div>
             ))}
         </div>
