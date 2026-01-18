@@ -78,7 +78,7 @@ const deleteDocument=async(req,res)=>{
 
         //delete from cloudianry
         let resourceType="image"
-        if(doc.fileType==="application.pdf"){
+        if(doc.fileType==="application/pdf"){
             resourceType="raw";
         }
         await cloudinary.uploader.destroy(doc.publicId,{

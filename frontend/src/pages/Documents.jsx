@@ -12,6 +12,9 @@ const Documents = () => {
   const [selectedFolder,setSelectedFolder]=useState("");
    const [selectedFolderId, setSelectedFolderId] = useState(null);
   const [clickChooseFolder,setClickChooseFolder]=useState(false);
+  const [shareLink,setShareLink]=useState("");
+  const [shareModalOpen,setShareModalOpen]=useState(false);
+  const [copied,setCopied]=useState(false);
   const ref=useRef(null);
   
   const [loading,setLoading]=useState(false);
@@ -103,6 +106,21 @@ const handleDelete=async(id)=>{
      console.log("Error in deleting documents",err);
   }
 }
+const handleShareLink=async(id)=>{
+  try{
+   
+    const link=await api.post(`/share/${id}`);
+    const token=link.data.token;
+    const frontendUrl=`${window.location.origin}/share/${token}`
+    setShareLink(frontendUrl);
+    setShareModalOpen(true);
+    console.log("link:",link)
+  
+  }
+  catch(err){
+    console.log("Error in sharing link",err);
+  }
+}
   return (
     <div className="flex bg-gray-100">
       {loading && (
@@ -150,7 +168,10 @@ const handleDelete=async(id)=>{
                   {selectedFolder.length > 0 ? selectedFolder : "Choose Folder"}
                 </div>
                 {clickChooseFolder && (
-                  <div className="absolute bg-white px-4 py-4 rounded-lg border border-gray-300" ref={ref}>
+                  <div
+                    className="absolute bg-white px-4 py-4 rounded-lg border border-gray-300"
+                    ref={ref}
+                  >
                     <div
                       className="px-2 py-2 border   hover:bg-gray-100 cursor-pointer border-gray-200"
                       onClick={() => {
@@ -224,12 +245,59 @@ const handleDelete=async(id)=>{
                   <p className="text-sm text-gray-400">
                     {getDaysAgo(item.updatedAt)}
                   </p>
-                  <button
-                    className="px-4 py-2 bg-purple-600 cursor-pointer hover:bg-purple-700 text-white font-bold rounded-lg"
-                    onClick={() => handleDelete(item._id)}
-                  >
-                    Delete
-                  </button>
+                  <div className="flex space-x-4 relative">
+                    <button
+                      className="px-4 py-2 bg-purple-600 cursor-pointer hover:bg-purple-700 text-white font-bold rounded-lg"
+                      onClick={() => handleShareLink(item._id)}
+                    >
+                      Share
+                    </button>
+                    {shareModalOpen && (
+                      <div className="fixed flex justify-center items-center inset-0 bg-black/30 backdrop-blur-sm  ">
+                        <div className="bg-white flex flex-col  py-10 px-12 rounded-lg shadow-lg w-lg space-y-4 items-center">
+                          <p className="text-xl font-medium text-center">
+                            Share document
+                          </p>
+                          <div className="flex w-full space-x-2">
+                            <input
+                              type="text"
+                              readOnly
+                              className="flex-1 px-4 py-2 border border-gray-300 rounded-lg outline-none focus-within:border-2 focus-within:border-purple-600"
+                              value={shareLink}
+                            />
+                            <div className="relative">
+                              <button
+                                className="px-4 py-2 rounded-lg border border-purple-600 bg-purple-600 text-white font-medium hover:bg-purple-500 cursor-pointer  text-sm"
+                                onClick={() => {
+                                  navigator.clipboard.writeText(shareLink);
+                                  setCopied(true);
+                                  setTimeout(() => setCopied(false), 2000);
+                                }}
+                              >
+                                Copy Link
+                              </button>
+                              {copied && (
+                                <p className="absolute text-center top-10 right-5 font-medium">Copied!</p>
+                              )}
+                            </div>
+                          </div>
+
+                          <button
+                            className="px-4 py-2 border border-gray-300 w-20 flex justify-center rounded-lg bg-gray-200 hover:bg-gray-300 font-medium cursor-pointer"
+                            onClick={() => setShareModalOpen(false)}
+                          >
+                            Close
+                          </button>
+                        </div>
+                      </div>
+                    )}
+                    <button
+                      className="px-4 py-2 bg-red-500 cursor-pointer hover:bg-red-600 text-white font-bold rounded-lg "
+                      onClick={() => handleDelete(item._id)}
+                    >
+                      Delete
+                    </button>
+                  </div>
                 </div>
               ))}
           </div>

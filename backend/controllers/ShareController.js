@@ -39,7 +39,7 @@ const createShareLink=async(req,res)=>{
         const shareUrl=`${req.protocol}://${req.get("host")}/api/share/${token}`;
         res.status(201).json({
             message:"Share Link created Successfully",
-            shareUrl,
+            token,
             expiresAt
         })
     }
@@ -63,7 +63,7 @@ const accessSharedDocument=async(req,res)=>{
             })
         }
         if(shareLink.expiresAt<new Date()){
-            res.status(410).json({
+            return res.status(410).json({
                 message:"Link has expired"
             })
         }

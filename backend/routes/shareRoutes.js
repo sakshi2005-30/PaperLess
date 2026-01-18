@@ -7,6 +7,6 @@ const protect=require("../middleware/authMiddleWare")
 //create shrelink
 router.post("/:docId",protect,createShareLink);
 
-//access shared dodument
+//access shared document
 router.get("/:token",accessSharedDocument)
 module.exports=router;

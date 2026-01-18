@@ -6,8 +6,10 @@ import Documents from "./pages/Documents"
 import { useEffect } from "react"
 import api from "./services/api"
 import Folders from "./pages/Folders"
+import ShareView from "./pages/ShareView"
 
 const App = () => {
+  
   const isAuthenticated=!!localStorage.getItem("token");
 
   return (
@@ -25,9 +27,13 @@ const App = () => {
           path="/documents"
           element={isAuthenticated ? <Documents /> : <Navigate to="/login" />}
         />
-        <Route path="/folders" element={isAuthenticated?<Folders/>:<Navigate to="/login"/>}/>
+        <Route
+          path="/folders"
+          element={isAuthenticated ? <Folders /> : <Navigate to="/login" />}
+        />
+        <Route path="/share/:token" element={<ShareView />} />
 
-        <Route path="*" element={<Login/>}/>
+        <Route path="*" element={<Login />} />
       </Routes>
     </div>
   );
